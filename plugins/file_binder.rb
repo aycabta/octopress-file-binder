@@ -23,6 +23,7 @@
 #
 
 require './plugins/post_filters.rb'
+require './plugins/image_tag.rb'
 
 module Jekyll
   BOUND_FILE_MATCHER = /^(.+\/)*(\d+-\d+-\d+)-(.*)_(.*)(\.[^.]+)$/
@@ -57,9 +58,11 @@ module Jekyll
   end
 
   class Site
-    alias_method :old_filter_entries, :filter_entries
+    attr_accessor :me
+
+    alias_method :old_filter_entries_for_file_binder, :filter_entries
     def filter_entries(entries)
-      entries = old_filter_entries(entries).reject do |e|
+      entries = old_filter_entries_for_file_binder(entries).reject do |e|
         result = false
         if e =~ Jekyll::BOUND_FILE_MATCHER
           result = true
@@ -68,12 +71,20 @@ module Jekyll
       end
     end
 
-    alias_method :old_cleanup, :cleanup
+    alias_method :old_cleanup_for_file_binder, :cleanup
     def cleanup
       self.posts.each do |post|
         post.cleanup_bound_files
       end
-      old_cleanup
+      old_cleanup_for_file_binder
+    end
+  end
+
+  module Convertible
+    alias_method :old_do_layout_for_file_binder, :do_layout
+    def do_layout(payload, layouts)
+      self.site.me = self
+      old_do_layout_for_file_binder(payload, layouts)
     end
   end
 
@@ -90,6 +101,29 @@ module Jekyll
           FileUtils.cp(src_path, dest_path)
         end
       end
+    end
+  end
+
+  class ImageTag
+    alias_method :old_render_for_file_binder, :render
+    def render(context)
+      if @img['src'] =~ /^\.\/(.*)$/
+        me = context.registers[:site].me
+        if me.class == Jekyll::Post
+          if ENV.has_key?('OCTOPRESS_ENV') && ENV['OCTOPRESS_ENV'] == 'preview'
+            url = 'http://localhost:4000/'
+          else
+            url = context.registers[:site].config['url']
+          end
+          url = url[-1] == '/' ? url[0..-2] : url
+          @img['src'] = url + me.url + $1
+        end
+      end
+      old_render_for_file_binder(context)
+rescue Exception => e
+  p e.to_s
+  p e.backtrace
+end
     end
   end
 
