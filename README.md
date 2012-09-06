@@ -21,3 +21,8 @@ Distributed under the [MIT License][MIT].
 
 [MIT]: http://www.opensource.org/licenses/mit-license.php
 
+TODO:
+-----
+
+* cleanup attached files
+
