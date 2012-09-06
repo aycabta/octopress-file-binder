@@ -39,6 +39,19 @@ module Jekyll
       end
       result
     end
+
+    def cleanup_bound_files
+      m, cats, date, slug, ext = *name.match(Post::MATCHER)
+      find_filename = [cats, date, '-', slug, '_*'].join
+      Dir[File.join(site.source, '_posts', find_filename)].each do |f|
+        if f =~ Jekyll::BOUND_FILE_MATCHER
+          dest_dir = File.dirname(destination(site.dest))
+          dest_filename = $4 + $5
+          dest_path = File.join(dest_dir, dest_filename)
+          FileUtils.rm_f(dest_path)
+        end
+      end
+    end
   end
 
   class Site
@@ -52,6 +65,14 @@ module Jekyll
         result
       end
     end
+
+    alias_method :old_cleanup, :cleanup
+    def cleanup
+      self.posts.each do |post|
+        post.cleanup_bound_files
+      end
+      old_cleanup
+    end
   end
 
   class FileBinder < PostFilter
@@ -60,7 +81,7 @@ module Jekyll
       find_filename = [cats, date, '-', slug, '_*'].join
       Dir[File.join(post.site.source, '_posts', find_filename)].each do |f|
         if f =~ Jekyll::BOUND_FILE_MATCHER
-          src_path = f#File.join(post.base, f)
+          src_path = f
           dest_dir = File.dirname(post.destination(post.site.dest))
           dest_filename = $4 + $5
           dest_path = File.join(dest_dir, dest_filename)
