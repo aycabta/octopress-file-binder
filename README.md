@@ -3,7 +3,7 @@ File Binder for Octopress
 
 Description:
 ------------
-Attach some images or other files to the entry
+Attach some images or other files to the entry.
 
 Usege:
 ------
