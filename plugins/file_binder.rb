@@ -125,10 +125,6 @@ module Jekyll
         end
       end
       old_render_for_file_binder(context)
-rescue Exception => e
-  p e.to_s
-  p e.backtrace
-end
     end
   end
 
