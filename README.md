@@ -15,6 +15,8 @@ The attached file puts out into the same directory of the entry by the name of "
 in this case it is "public/blog/YYYY/DD/MM/title-of-a-entry/filename-of-image.png".
 You can refer the file from the entry by img or others tags.
 
+Support customized permalink in _config.yml that is different from "/blog/:year/:month/:day/:title/".
+
 License:
 --------
 Distributed under the [MIT License][MIT].
