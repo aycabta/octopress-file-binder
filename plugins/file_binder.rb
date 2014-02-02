@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 # Title: File Binder for Octopress
-# Authors: Code Ass http://aycabta.github.com/
+# Authors: Code Ass http://aycabta.github.io/
 # Description: Attach some images or other files to the entry
 #
 # Usege:
